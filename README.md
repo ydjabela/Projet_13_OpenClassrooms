@@ -1,11 +1,10 @@
 # Projet_13_OpenClassrooms
-## Créez une API sécurisée RESTful en utilisant Django REST
-Epic Events, une entreprise de conseil et de gestion dans l'événementiel qui répond aux besoins des start-up voulant organiser des « fêtes épiques ».
+## Mettez à l'échelle une application Django en utilisant une architecture modulaire
+Orange County Lettings est une start-up dans le secteur de la location de biens immobiliers. La start-up est en pleine phase d’expansion aux États-Unis. 
 
 ###Description du projet :
-Démonstration de l'application opérationnelle de CRM Django finale.
-* Le code d'une application présentant des points de terminaison d'API sécurisés utilisant le framework Django REST pour permettre les opérations CRUD et le site d'administration Django en tant qu'interface front-end.
-* Django ORM & une base de données PostgreSQL configurés dans le fichier « settings.py ».
+
+
 
 ### Récupérer le projet :
 
