@@ -91,3 +91,10 @@ flake8 --format=html --htmldir=flake-report --exclude=env --max-line-length=119
 ### Contributeurs
 - Yacine Djabela
 - Stephane Didier
+
+
+python -m venv Projet_13
+Projet_13\Scripts\activate.bat
+cd .\Projet_13_OpenClassrooms\
+cd .\oc_lettings_site\
+python manage.py runserver 
