@@ -2,8 +2,10 @@ from django.shortcuts import render
 from .models import Letting
 
 
-# Aenean leo magna, vestibulum et tincidunt fermentum, consectetur quis velit. Sed non placerat massa. Integer est nunc, pulvinar a
-# tempor et, bibendum id arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras eget scelerisque
+# Aenean leo magna, vestibulum et tincidunt fermentum,
+# consectetur quis velit. Sed non placerat massa. Integer est nunc, pulvinar a
+# tempor et, bibendum id arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;
+# Cras eget scelerisque
 def lettings_index(request):
     lettings_list = Letting.objects.all()
     context = {'lettings_list': lettings_list}
