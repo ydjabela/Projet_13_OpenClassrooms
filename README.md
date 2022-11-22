@@ -52,11 +52,11 @@ Une fois activé, pour démarrer le serveur local, il faudra utiliser la command
 python manage.py runserver 
 ```
 #### Tests unitaires
-
-- `cd /path/to/Python-OC-Lettings-FR`
-- `source venv/bin/activate`
-- `pytest`
-
+```
+python manage.py test oc_lettings_site.tests
+python manage.py test profiles.tests
+python manage.py test letting.tests
+```
 #### Base de données
 
 - `cd /path/to/Python-OC-Lettings-FR`
