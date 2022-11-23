@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Address, Letting
+from letting.models import Address, Letting
 from django.urls import reverse
 
 

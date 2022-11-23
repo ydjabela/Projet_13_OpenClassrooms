@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 # Local Libs:
-from .models import Profile
+from profiles.models import Profile
 
 
 class TestsProfiles(TestCase):
