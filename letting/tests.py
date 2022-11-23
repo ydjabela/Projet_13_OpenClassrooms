@@ -57,4 +57,3 @@ class AdressTestCase(TestCase):
 
     def test_adress(self):
         Address.objects.get(street="Flandre")
-
