@@ -53,7 +53,7 @@ python manage.py runserver
 ```
 #### Tests unitaires
 ```
-python manage.py test oc_lettings_site.tests
+python manage.py test home.tests
 python manage.py test profiles.tests
 python manage.py test letting.tests
 ```
