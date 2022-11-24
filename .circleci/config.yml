@@ -16,7 +16,7 @@ jobs:
           command: python manage.py test
       - run:
           name : Run Linting
-          command: flake8
+          command: flake8 --format=html --htmldir=flake-report --exclude=env --max-line-length=119
   build_push:
     docker:
       - image: cimg/python:3.10
