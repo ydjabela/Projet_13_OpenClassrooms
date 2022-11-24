@@ -18,7 +18,8 @@ jobs:
           name : Run Linting
           command: flake8 --max-line-length=119
   build_push:
-    executor: docker-publisher
+    docker:
+      - image: cimg/python:3.10
     steps:
       - checkout
       - setup_remote_docker:
