@@ -86,7 +86,7 @@ pip install -r requirements.txt
 ###Vérifier la qualité du code :
 Pour lancer la vérification de la qualité du code : 
 ```
-flake8 --format=html --htmldir=flake-report --exclude=env --max-line-length=119
+flake8 --format=html --exclude=env --max-line-length=119
 ```
 ### Contributeurs
 - Yacine Djabela
