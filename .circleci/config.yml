@@ -1,24 +1,54 @@
 version: 2.1
 orbs:
-  python: circleci/python@2.0.3
-  docker: circleci/docker@2.1.2
-  heroku: circleci/heroku@1.2.6
-jobs:
-  build_test:
+  heroku: circleci/heroku@2.0.0
+workflows:
+  heroku_deploy:
+    jobs:
+      - build-and-test
+      - build-image:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: master
+      - publish-image:
+          requires:
+            - build-image
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - publish-image
+          filters:
+            branches:
+              only: master
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: stdi/oc-lettings
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/base:current
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.10.7
+    working_directory: ~/app
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: pip
       - run:
-          name: Run Tests
-          command: python manage.py test
+          name: Install dependencies
+          command: pip install -r requirements.txt
       - run:
-          name : Run Linting
+          name: Run flake8
           command: flake8 --max-line-length=119
-  
-
+      - run:
+          name: Run tests
+          command: python manage.py test
+      - persist_to_workspace:
+          root: ~/app
+          paths:
+            - .
   build-image:
     executor: docker-publisher
     steps:
@@ -49,51 +79,25 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:$CIRCLE_SHA1
-  build_push:
-    docker:
-      - image: cimg/python:3.10
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Package app and push to DockerHub
-          command: |
-
   deploy:
-    executor: heroku/default
+    executor: docker-publisher
     steps:
-      - checkout
-      - heroku/install
+      - attach_workspace:
+          at: /tmp/workspace
       - setup_remote_docker
       - run:
-          name: Deploy to Heroku
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker image to Heroku
           command: |
-            HEROKU_API_KEY=${HEROKU_API_KEY} heroku container:login
-            HEROKU_API_KEY=${HEROKU_API_KEY} heroku container:push -a ${HEROKU_APP_NAME} web
-            HEROKU_API_KEY=${HEROKU_API_KEY} heroku container:release -a ${HEROKU_APP_NAME} web
-workflows:
-  build_master:
-    jobs:
-      - build_test:
-          filters:
-            branches:
-              only: master
-      - build_push:
-          requires:
-            - build_test
-          filters:
-            branches:
-              only: master
-      - deploy:
-          requires:
-            - build_push
-          filters:
-            branches:
-              only: master
-  build_other_branches:
-    jobs:
-      - build_test:
-          filters:
-            branches:
-              ignore: master
+            echo "$HEROKU_API_KEY" | docker login -u "$HEROKU_LOGIN" --password-stdin registry.heroku.com
+            docker tag $IMAGE_NAME:$CIRCLE_SHA1 registry.heroku.com/$HEROKU_APP_NAME/web
+            docker push registry.heroku.com/$HEROKU_APP_NAME/web
+      - heroku/install
+      - run:
+          name: Login to Heroku container registry
+          command: heroku container:login
+      - run:
+          name: Release Docker image to Heroku
+          command: heroku container:release -a $HEROKU_APP_NAME web
