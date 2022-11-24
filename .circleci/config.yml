@@ -1,54 +1,22 @@
 version: 2.1
 orbs:
-  heroku: circleci/heroku@2.0.0
-workflows:
-  heroku_deploy:
-    jobs:
-      - build-and-test
-      - build-image:
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only: master
-      - publish-image:
-          requires:
-            - build-image
-          filters:
-            branches:
-              only: master
-      - deploy:
-          requires:
-            - publish-image
-          filters:
-            branches:
-              only: master
-executors:
-  docker-publisher:
-    environment:
-      IMAGE_NAME: oc-lettings
-    docker:
-      - image: cimg/base:current
+  python: circleci/python@2.0.3
+  docker: circleci/docker@2.1.2
+  heroku: circleci/heroku@1.2.6
 jobs:
-  build-and-test:
+  build_test:
     docker:
-      - image: cimg/python:3.10.7
-    working_directory: ~/app
+      - image: cimg/python:3.10
     steps:
       - checkout
+      - python/install-packages:
+          pkg-manager: pip
       - run:
-          name: Install dependencies
-          command: pip install -r requirements.txt
+          name: Run Tests
+          command: pytest
       - run:
-          name: Run flake8
-          command: flake8 --max-line-length=119
-      - run:
-          name: Run tests
-          command: python manage.py test
-      - persist_to_workspace:
-          root: ~/app
-          paths:
-            - .
+          name : Run Linting
+          command: flake8
   build_push:
     docker:
       - image: cimg/python:3.10
@@ -59,31 +27,46 @@ jobs:
       - run:
           name: Build And Push Docker Image
           command: |
-            TAG=0.0.$CIRCLE_BUILD_NUM
-            docker login -u $DOCKER_USER --password-stdin
+            TAG=0.0.1
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
             docker build -t $DOCKER_USER/oc_lettings:$TAG .
             docker tag $DOCKER_USER/oc_lettings:$TAG $DOCKER_USER/oc_lettings:latest
             docker push $DOCKER_USER/oc_lettings:$TAG
             docker push $DOCKER_USER/oc_lettings:latest
   deploy:
-    executor: docker-publisher
+    executor: heroku/default
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
+      - checkout
+      - heroku/install
       - setup_remote_docker
       - run:
-          name: Load archived Docker image
-          command: docker load -i /tmp/workspace/image.tar
-      - run:
-          name: Publish Docker image to Heroku
+          name: Deploy to Heroku
           command: |
-            echo "$HEROKU_API_KEY" | docker login -u "$HEROKU_LOGIN" --password-stdin registry.heroku.com
-            docker tag $IMAGE_NAME:$CIRCLE_SHA1 registry.heroku.com/$HEROKU_APP_NAME/web
-            docker push registry.heroku.com/$HEROKU_APP_NAME/web
-      - heroku/install
-      - run:
-          name: Login to Heroku container registry
-          command: heroku container:login
-      - run:
-          name: Release Docker image to Heroku
-          command: heroku container:release -a $HEROKU_APP_NAME web
+            HEROKU_API_KEY=${HEROKU_API_KEY} heroku container:login
+            HEROKU_API_KEY=${HEROKU_API_KEY} heroku container:push -a ${HEROKU_APP_NAME} web
+            HEROKU_API_KEY=${HEROKU_API_KEY} heroku container:release -a ${HEROKU_APP_NAME} web
+workflows:
+  build_master:
+    jobs:
+      - build_test:
+          filters:
+            branches:
+              only: master
+      - build_push:
+          requires:
+            - build_test
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - build_push
+          filters:
+            branches:
+              only: master
+  build_other_branches:
+    jobs:
+      - build_test:
+          filters:
+            branches:
+              ignore: master
