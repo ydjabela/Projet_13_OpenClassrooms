@@ -17,22 +17,18 @@ jobs:
       - run:
           name : Run Linting
           command: flake8 --max-line-length=119
-  build_push:
-    docker:
-      - image: cimg/python:3.10
+  publish-latest-to-DockerHub:
+    executor: docker-publisher
     steps:
-      - setup_remote_docker
       - checkout
-      - docker/check
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: Build And Push Docker Image
+          name: Publish Docker Image to Docker Hub
           command: |
-            TAG=0.0.$CIRCLE_BUILD_NUM
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker build -t $DOCKER_LOGIN/oc_lettings:$TAG .
-            docker tag $DOCKER_LOGIN/oc_lettings:$TAG $DOCKER_LOGIN/oc_lettings:latest
-            docker push $DOCKER_LOGIN/oc_lettings:$TAG
-            docker push $DOCKER_LOGIN/oc_lettings:latest
+            docker build -t $IMAGE_NAME:$CIRCLE_SHA1 .
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            docker push $IMAGE_NAME:$CIRCLE_SHA1
   deploy:
     executor: heroku/default
     steps:
