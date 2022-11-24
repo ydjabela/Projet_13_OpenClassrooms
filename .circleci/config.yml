@@ -13,7 +13,7 @@ jobs:
           pkg-manager: pip
       - run:
           name: Run Tests
-          command: pytest
+          command: python manage.py test
       - run:
           name : Run Linting
           command: flake8
