@@ -25,11 +25,15 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            docker build -t $IMAGE_NAME:$CIRCLE_SHA1 .
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-            docker push $IMAGE_NAME:$CIRCLE_SHA1
+          name: Build docker image
+          command: docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:$CIRCLE_SHA1 .
+      - run:
+          name: Save docker image
+          command: docker save -o image.tar $DOCKERHUB_USERNAME/$IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
   deploy:
     executor: heroku/default
     steps:
