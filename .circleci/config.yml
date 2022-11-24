@@ -17,7 +17,7 @@ jobs:
       - run:
           name : Run Linting
           command: flake8 --max-line-length=119
-  publish-latest-to-DockerHub:
+  build_master:
     executor: docker-publisher
     steps:
       - checkout
