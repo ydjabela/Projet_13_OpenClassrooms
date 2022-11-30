@@ -38,7 +38,7 @@ Projet_13\Scripts\activate.bat
 
 MacOS/Linux :
 ```
-source Projet_12/bin/activate
+source Projet_13/bin/activate
 ```
 
 ### Installation des packages necessaire pour ce projet
@@ -73,6 +73,14 @@ python manage.py test letting.tests
 - Aller sur `http://localhost:8000/admin`
 - Connectez-vous avec l'utilisateur `admin`, mot de passe `Abc1234!`
 
+### run docker  image  on  local
+```
+docker build -t ydjabela/oc_lettings_site:1 .
+docker tag ydjabela/oc_lettings_site:1 ydjabela/oc_lettings_site:latest
+docker push ydjabela/oc_lettings_site:1
+docker push ydjabela/oc_lettings_site:latest
+docker run -p 8000:8000 ydjabela/oc_lettings_site
+```
 ### Windows
 
 Utilisation de PowerShell, comme ci-dessus sauf :

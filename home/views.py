@@ -10,3 +10,7 @@ from django.shortcuts import render
 # Praesent volutpat porttitor magna, non finibus neque cursus id.
 def index(request):
     return render(request, 'home/index.html')
+
+
+def sentry_debug(request):
+    return 3/0

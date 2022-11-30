@@ -5,4 +5,5 @@ app_name = 'homes'
 
 urlpatterns = [
     path('', views.index, name='homes_index'),
+    path('sentry-debug/', views.sentry_debug)
 ]

@@ -8,4 +8,5 @@ urlpatterns = [
     path('lettings/', include("letting.urls", namespace='lettings')),
     path('profiles/', include("profiles.urls", namespace='profiles')),
 
+
 ]
