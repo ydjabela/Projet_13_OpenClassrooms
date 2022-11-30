@@ -37,7 +37,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['oc-lettings-26.herokuapp.com', '.herokuapp.com', '0.0.0.0', '127.0.0.1', 'localhost']
 
 
-# Application definition
+# Application definitions
 
 INSTALLED_APPS = [
     'django.contrib.admin',
